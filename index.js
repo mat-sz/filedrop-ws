@@ -28,7 +28,9 @@ wss.on('connection', function connection(ws) {
                         break;
                     case 'request':
                         if (json.requestId && typeof json.requestId === 'string'
-                            && json.fileName && typeof json.fileName === 'string') {
+                            && json.fileName && typeof json.fileName === 'string'
+                            && json.fileSize && typeof json.fileSize === 'number'
+                            && json.fileType && typeof json.fileType === 'string') {
                             
                             data.clientId = ws.clientId;
                             const targets = clients.find(client => client.clientName === ws.clientName);
