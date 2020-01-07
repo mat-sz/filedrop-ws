@@ -2,8 +2,9 @@ const WebSocket = require('ws');
 const wss = new WebSocket.Server({ port: 5000 });
 const uuid = require('uuid/v4');
 
+const allowedActions = [ 'accept', 'reject', 'cancel' ];
 let clients = [];
-wss.on('connection', function connection(ws) {
+wss.on('connection', (ws) => {
     ws.clientId = uuid();
     clients.push(ws);
 
@@ -26,14 +27,28 @@ wss.on('connection', function connection(ws) {
                             ws.clientName = json.clientName;
                         }
                         break;
-                    case 'request':
-                        if (json.requestId && typeof json.requestId === 'string'
+                    case 'transfer':
+                        if (json.transferId && typeof json.transferId === 'string'
                             && json.fileName && typeof json.fileName === 'string'
                             && json.fileSize && typeof json.fileSize === 'number'
                             && json.fileType && typeof json.fileType === 'string') {
                             
-                            data.clientId = ws.clientId;
-                            const targets = clients.find(client => client.clientName === ws.clientName);
+                            json.clientId = ws.clientId;
+                            data = JSON.stringify(json);
+
+                            const targets = clients.filter(client => client.clientName === ws.clientName && client !== ws);
+                            targets.forEach(client => client.send(data));
+                        }
+                        break;
+                    case 'action':
+                        if (json.transferId && typeof json.transferId === 'string'
+                            && json.action && typeof json.action === 'string'
+                            && allowedActions.includes(json.action)) {
+                            
+                            json.clientId = ws.clientId;
+                            data = JSON.stringify(json);
+
+                            const targets = clients.filter(client => client.clientName === ws.clientName && client !== ws);
                             targets.forEach(client => client.send(data));
                         }
                         break;
@@ -42,10 +57,12 @@ wss.on('connection', function connection(ws) {
                             && json.data.type && typeof json.data.type === 'string'
                             && json.data.sdp && typeof json.data.sdp === 'string'
                             && json.targetId && typeof json.targetId === 'string'
-                            && json.requestId && typeof json.requestId === 'string') {
+                            && json.transferId && typeof json.transferId === 'string') {
 
-                            data.clientId = ws.clientId;
-                            const targets = clients.find(client => client.clientId === json.targetId);
+                            json.clientId = ws.clientId;
+                            data = JSON.stringify(json);
+
+                            const targets = clients.filter(client => client.clientId === json.targetId && client !== ws);
                             targets.forEach(client => client.send(data));
                         }
                         break;
