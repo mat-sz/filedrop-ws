@@ -1,0 +1,12 @@
+{
+  "name": "filedrop-ws",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "uuid": "^3.3.3",
+    "ws": "^7.2.1"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}
