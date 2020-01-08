@@ -52,10 +52,22 @@ wss.on('connection', (ws) => {
                             targets.forEach(client => client.send(data));
                         }
                         break;
-                    case 'rtc':
+                    case 'rtcDescription':
                         if (json.data && typeof json.data === 'object'
                             && json.data.type && typeof json.data.type === 'string'
                             && json.data.sdp && typeof json.data.sdp === 'string'
+                            && json.targetId && typeof json.targetId === 'string'
+                            && json.transferId && typeof json.transferId === 'string') {
+
+                            json.clientId = ws.clientId;
+                            data = JSON.stringify(json);
+
+                            const targets = clients.filter(client => client.clientId === json.targetId && client !== ws);
+                            targets.forEach(client => client.send(data));
+                        }
+                        break;
+                    case 'rtcCandidate':
+                        if (json.data && typeof json.data === 'object'
                             && json.targetId && typeof json.targetId === 'string'
                             && json.transferId && typeof json.transferId === 'string') {
 
