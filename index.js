@@ -24,7 +24,7 @@ wss.on('connection', (ws) => {
                 switch (json.type) {
                     case 'name':
                         if (json.clientName && typeof json.clientName === 'string') {
-                            ws.clientName = json.clientName;
+                            ws.clientName = json.clientName.toUpperCase();
                         }
                         break;
                     case 'transfer':
