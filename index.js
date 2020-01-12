@@ -1,5 +1,12 @@
+require('dotenv-flow').config();
+
+// Configuration
+const acceptForwardedFor = process.env.WS_BEHIND_PROXY === 'true' || process.env.WS_BEHIND_PROXY === 'yes';
+const host = process.env.WS_HOST || '127.0.0.1';
+const port = process.env.WS_PORT || 5000;
+
 const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: 5000 });
+const wss = new WebSocket.Server({ host: host, port: port });
 const uuid = require('uuid/v4');
 const randomColor = require('randomcolor');
 
@@ -33,7 +40,7 @@ wss.on('connection', (ws, req) => {
     ws.firstSeen = new Date();
     ws.lastSeen = new Date();
 
-    const address = (process.env.WS_BEHIND_PROXY && req.headers['x-forwarded-for']) ? req.headers['x-forwarded-for'] : req.connection.remoteAddress;
+    const address = (acceptForwardedFor && req.headers['x-forwarded-for']) ? req.headers['x-forwarded-for'] : req.connection.remoteAddress;
     ws.remoteAddress = address;
 
     const localClients = clients
