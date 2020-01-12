@@ -34,6 +34,11 @@ function networkMessage(networkName) {
     });
 }
 
+function removeClient(client) {
+    client.setNetworkName(null);
+    clients = clients.filter(c => c !== client);
+}
+
 wss.on('connection', (ws, req) => {
     ws.clientId = uuid();
     ws.clientColor = randomColor({ luminosity: 'light' });
@@ -147,6 +152,10 @@ wss.on('connection', (ws, req) => {
             }
         } catch (e) {}
     });
+
+    ws.on('close', () => {
+        removeClient(ws);
+    });
 });
 
 setInterval(() => {
@@ -160,7 +169,7 @@ setInterval(() => {
     });
 }, 1000);
 
-// Ping clients to keep connection alive (when behind nginx)
+// Ping clients to keep the connection alive (when behind nginx)
 setInterval(() => {
     const pingMessage = JSON.stringify({ type: 'ping', timestamp: new Date().getTime() });
 
@@ -170,6 +179,21 @@ setInterval(() => {
         try {
             client.send(pingMessage);
         } catch {
+            removeClient(client);
+            client.close();
+        }
+    });
+}, 5000);
+
+// Remove inactive connections
+setInterval(() => {
+    const minuteAgo = new Date(Date.now() - 1000 * 20);
+
+    clients.forEach((client) => {
+        if (client.readyState !== 1) return;
+        
+        if (client.lastSeen < minuteAgo) {
+            removeClient(client);
             client.close();
         }
     });
