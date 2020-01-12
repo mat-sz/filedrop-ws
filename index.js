@@ -159,3 +159,18 @@ setInterval(() => {
         }
     });
 }, 1000);
+
+// Ping clients to keep connection alive (when behind nginx)
+setInterval(() => {
+    const pingMessage = JSON.stringify({ type: 'ping', timestamp: new Date().getTime() });
+
+    clients.forEach((client) => {
+        if (client.readyState !== 1) return;
+
+        try {
+            client.send(pingMessage);
+        } catch {
+            client.close();
+        }
+    });
+}, 10000);
