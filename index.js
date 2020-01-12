@@ -5,22 +5,58 @@ const randomColor = require('randomcolor');
 
 const allowedActions = [ 'accept', 'reject', 'cancel' ];
 let clients = [];
+
+function networkMessage(networkName) {
+    const networkClients = clients.filter((client) => client.networkName === networkName);
+    const network = networkClients.sort((a, b) => b.firstSeen - a.firstSeen).map((client) => {
+        return {
+            clientId: client.clientId,
+            clientColor: client.clientColor,
+        };
+    });
+
+    const networkMessage = JSON.stringify({
+        type: 'network',
+        clients: network,
+    });
+
+    networkClients.forEach((client) => {
+        try {
+            client.send(networkMessage);
+        } catch {}
+    });
+}
+
 wss.on('connection', (ws, req) => {
     ws.clientId = uuid();
     ws.clientColor = randomColor({ luminosity: 'light' });
+    ws.firstSeen = new Date();
     ws.lastSeen = new Date();
 
     const address = (process.env.WS_BEHIND_PROXY && req.headers['x-forwarded-for']) ? req.headers['x-forwarded-for'] : req.connection.remoteAddress;
     ws.remoteAddress = address;
 
-    const networkClients = clients
+    const localClients = clients
                         .filter((client) => client.remoteAddress === address && client.networkName)
                         .sort((a, b) => b.lastSeen - a.lastSeen);
     
     let suggestedName = null;
-    if (networkClients.length > 0) {
-        suggestedName = networkClients[0].networkName;
+    if (localClients.length > 0) {
+        suggestedName = localClients[0].networkName;
     }
+
+    ws.setNetworkName = (networkName) => {
+        const previousName = ws.networkName;
+        ws.networkName = networkName;
+
+        if (previousName) {
+            networkMessage(previousName);
+        }
+
+        if (networkName) {
+            networkMessage(networkName);
+        }
+    };
 
     clients.push(ws);
 
@@ -44,7 +80,7 @@ wss.on('connection', (ws, req) => {
                 switch (json.type) {
                     case 'name':
                         if (json.networkName && typeof json.networkName === 'string') {
-                            ws.networkName = json.networkName.toUpperCase();
+                            ws.setNetworkName(json.networkName.toUpperCase());
                         }
                         break;
                     case 'transfer':
@@ -105,5 +141,12 @@ wss.on('connection', (ws, req) => {
 });
 
 setInterval(() => {
-    clients = clients.filter((client) => client.readyState <= 1);
+    clients = clients.filter((client) => {
+        if (client.readyState <= 1) {
+            return true;
+        } else {
+            client.setNetworkName(null);
+            return false;
+        }
+    });
 }, 1000);
