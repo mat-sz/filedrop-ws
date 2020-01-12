@@ -87,24 +87,26 @@ wss.on('connection', (ws, req) => {
                         if (json.transferId && typeof json.transferId === 'string'
                             && json.fileName && typeof json.fileName === 'string'
                             && json.fileSize && typeof json.fileSize === 'number'
-                            && json.fileType && typeof json.fileType === 'string') {
+                            && json.fileType && typeof json.fileType === 'string'
+                            && json.targetId && typeof json.targetId === 'string') {
                             
                             json.clientId = ws.clientId;
                             data = JSON.stringify(json);
 
-                            const targets = clients.filter(client => client.networkName === ws.networkName && client !== ws);
+                            const targets = clients.filter(client => client.clientId === json.targetId && client !== ws);
                             targets.forEach(client => client.send(data));
                         }
                         break;
                     case 'action':
                         if (json.transferId && typeof json.transferId === 'string'
                             && json.action && typeof json.action === 'string'
+                            && json.targetId && typeof json.targetId === 'string'
                             && allowedActions.includes(json.action)) {
                             
                             json.clientId = ws.clientId;
                             data = JSON.stringify(json);
 
-                            const targets = clients.filter(client => client.networkName === ws.networkName && client !== ws);
+                            const targets = clients.filter(client => client.clientId === json.targetId && client !== ws);
                             targets.forEach(client => client.send(data));
                         }
                         break;
