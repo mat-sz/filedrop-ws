@@ -5,18 +5,35 @@ const randomColor = require('randomcolor');
 
 const allowedActions = [ 'accept', 'reject', 'cancel' ];
 let clients = [];
-wss.on('connection', (ws) => {
+wss.on('connection', (ws, req) => {
     ws.clientId = uuid();
     ws.clientColor = randomColor({ luminosity: 'light' });
+    ws.lastSeen = new Date();
+
+    const address = (process.env.WS_BEHIND_PROXY && req.headers['x-forwarded-for']) ? req.headers['x-forwarded-for'] : req.connection.remoteAddress;
+    ws.remoteAddress = address;
+
+    const networkClients = clients
+                        .filter((client) => client.remoteAddress === address && client.clientName)
+                        .sort((a, b) => b.lastSeen - a.lastSeen);
+    
+    let suggestedName = null;
+    if (networkClients.length > 0) {
+        suggestedName = networkClients[0].clientName;
+    }
+
     clients.push(ws);
 
     ws.send(JSON.stringify({
         type: 'welcome',
         clientId: ws.clientId,
         clientColor: ws.clientColor,
+        suggestedName: suggestedName,
     }));
 
     ws.on('message', (data) => {
+        ws.lastSeen = new Date();
+
         // Prevents DDoS and abuse.
         if (!data || data.length > 1024) return;
 
