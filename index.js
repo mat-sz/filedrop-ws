@@ -1,16 +1,19 @@
 const WebSocket = require('ws');
 const wss = new WebSocket.Server({ port: 5000 });
 const uuid = require('uuid/v4');
+const randomColor = require('randomcolor');
 
 const allowedActions = [ 'accept', 'reject', 'cancel' ];
 let clients = [];
 wss.on('connection', (ws) => {
     ws.clientId = uuid();
+    ws.clientColor = randomColor({ luminosity: 'light' });
     clients.push(ws);
 
     ws.send(JSON.stringify({
         type: 'welcome',
         clientId: ws.clientId,
+        clientColor: ws.clientColor,
     }));
 
     ws.on('message', (data) => {
