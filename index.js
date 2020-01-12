@@ -14,12 +14,12 @@ wss.on('connection', (ws, req) => {
     ws.remoteAddress = address;
 
     const networkClients = clients
-                        .filter((client) => client.remoteAddress === address && client.clientName)
+                        .filter((client) => client.remoteAddress === address && client.networkName)
                         .sort((a, b) => b.lastSeen - a.lastSeen);
     
     let suggestedName = null;
     if (networkClients.length > 0) {
-        suggestedName = networkClients[0].clientName;
+        suggestedName = networkClients[0].networkName;
     }
 
     clients.push(ws);
@@ -43,8 +43,8 @@ wss.on('connection', (ws, req) => {
             if (json && json.type && typeof json.type === 'string') {
                 switch (json.type) {
                     case 'name':
-                        if (json.clientName && typeof json.clientName === 'string') {
-                            ws.clientName = json.clientName.toUpperCase();
+                        if (json.networkName && typeof json.networkName === 'string') {
+                            ws.networkName = json.networkName.toUpperCase();
                         }
                         break;
                     case 'transfer':
@@ -56,7 +56,7 @@ wss.on('connection', (ws, req) => {
                             json.clientId = ws.clientId;
                             data = JSON.stringify(json);
 
-                            const targets = clients.filter(client => client.clientName === ws.clientName && client !== ws);
+                            const targets = clients.filter(client => client.networkName === ws.networkName && client !== ws);
                             targets.forEach(client => client.send(data));
                         }
                         break;
@@ -68,7 +68,7 @@ wss.on('connection', (ws, req) => {
                             json.clientId = ws.clientId;
                             data = JSON.stringify(json);
 
-                            const targets = clients.filter(client => client.clientName === ws.clientName && client !== ws);
+                            const targets = clients.filter(client => client.networkName === ws.networkName && client !== ws);
                             targets.forEach(client => client.send(data));
                         }
                         break;
