@@ -11,6 +11,7 @@ const uuid = require('uuid/v4');
 const randomColor = require('randomcolor');
 
 const allowedActions = [ 'accept', 'reject', 'cancel' ];
+const rtcConfiguration = require('./rtcConfiguration');
 let clients = [];
 
 function networkMessage(networkName) {
@@ -77,6 +78,7 @@ wss.on('connection', (ws, req) => {
         clientId: ws.clientId,
         clientColor: ws.clientColor,
         suggestedName: suggestedName,
+        rtcConfiguration: rtcConfiguration,
     }));
 
     ws.on('message', (data) => {
