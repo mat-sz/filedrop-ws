@@ -24,4 +24,5 @@ The following variables are used for the configuration:
 | `TURN_SERVER`     | null                           | TURN server address.                      |
 | `TURN_USERNAME`   | null                           | TURN username.                            |
 | `TURN_CREDENTIAL` | null                           | TURN credential (password).               |
-| `TURN_SECRET`     | null                           | TURN secret (required for `hmac`)         |
+| `TURN_SECRET`     | null                           | TURN secret (required for `hmac`).        |
+| `TURN_EXPIRY`     | `3600`                         | TURN token expiry (when in `hmac` mode), in seconds. |
