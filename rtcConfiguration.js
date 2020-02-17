@@ -8,7 +8,7 @@ const turnCredential = process.env.TURN_CREDENTIAL || null;
 const turnSecret = process.env.TURN_SECRET || null;
 const turnExpiry = parseInt(process.env.TURN_EXPIRY) || 3600;
 
-module.exports = () => {
+module.exports = (clientId) => {
     let iceServers = [];
     
     iceServers.push({
@@ -18,14 +18,14 @@ module.exports = () => {
     if (turnServer && turnUsername) {
         if (turnMode === 'hmac' && turnSecret) {
             const timestamp = Math.floor(new Date().getTime()/1000) + turnExpiry;
-            const username = timestamp + ':' + turnUsername;
+            const username = timestamp + ':' + clientId;
             const hmac = crypto.createHmac('sha1', turnSecret);
             hmac.setEncoding('base64');
             hmac.write(username);
             hmac.end();
             iceServers.push({
                 urls: turnServer,
-                username: turnUsername,
+                username: username,
                 credential: hmac.read(),
             });
         } else if (turnCredential) {

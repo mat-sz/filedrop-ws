@@ -78,7 +78,7 @@ wss.on('connection', (ws, req) => {
         clientId: ws.clientId,
         clientColor: ws.clientColor,
         suggestedName: suggestedName,
-        rtcConfiguration: rtcConfiguration(),
+        rtcConfiguration: rtcConfiguration(ws.clientId),
     }));
 
     ws.on('message', (data) => {
