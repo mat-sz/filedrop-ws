@@ -19,7 +19,9 @@ The following variables are used for the configuration:
 | `WS_HOST`         | `127.0.0.1`   | IP address to bind to.                                                            |
 | `WS_PORT`         | `5000`        | Port to bind to.                                                                  |
 | `WS_BEHIND_PROXY` | `no`          | Set to `yes` if you want the application to respect the `X-Forwarded-For` header. |
-| `STUN_SERVER`     | `stun:stun.1.google.com:19302` | WebRTC configuration - STUN server.                              |
-| `TURN_SERVER`     | null                           | WebRTC configuration - TURN server.                              |
-| `TURN_USERNAME`   | null                           | WebRTC configuration - TURN username.                            |
-| `TURN_CREDENTIAL` | null                           | WebRTC configuration - TURN credential (password).               |
+| `STUN_SERVER`     | `stun:stun.1.google.com:19302` | STUN server address.                      |
+| `TURN_MODE`       | `default`                      | `default` for static credentials, `hmac` for time-limited credentials. |
+| `TURN_SERVER`     | null                           | TURN server address.                      |
+| `TURN_USERNAME`   | null                           | TURN username.                            |
+| `TURN_CREDENTIAL` | null                           | TURN credential (password).               |
+| `TURN_SECRET`     | null                           | TURN secret (required for `hmac`)         |
