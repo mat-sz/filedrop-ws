@@ -10,10 +10,6 @@ export class ClientManager {
     this.sendNetworkMessage = this.sendNetworkMessage.bind(this);
   }
 
-  addSocket(ws: WebSocket, req: IncomingMessage) {
-    this.clients.push(new Client(ws, req));
-  }
-
   addClient(client: Client) {
     this.clients.push(client);
   }

@@ -130,7 +130,6 @@ setInterval(() => {
   clientManager.pingClients();
 }, 5000);
 
-// Remove inactive connections
 setInterval(() => {
   clientManager.removeInactiveClients();
 }, 10000);
