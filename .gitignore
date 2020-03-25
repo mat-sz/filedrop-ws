@@ -2,6 +2,7 @@ yarn-error.log
 npm-error.log
 node_modules
 dist
+build
 
 .env.local
 .env.development.local

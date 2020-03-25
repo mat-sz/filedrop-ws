@@ -3,12 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@types/node": "^12.12.31",
+    "@types/randomcolor": "^0.5.4",
+    "@types/uuid": "^7.0.2",
+    "@types/ws": "^7.2.3",
     "dotenv-flow": "^3.1.0",
     "husky": "^4.2.3",
     "lint-staged": "^10.0.9",
     "prettier": "^2.0.2",
     "randomcolor": "^0.5.4",
-    "uuid": "^3.3.3",
+    "ts-node-dev": "^1.0.0-pre.44",
+    "typescript": "^3.8.3",
+    "uuid": "^7.0.2",
     "ws": "^7.2.1"
   },
   "husky": {
@@ -22,6 +28,8 @@
     ]
   },
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node build/index.js",
+    "build": "tsc",
+    "dev": "ts-node-dev --respawn --transpileOnly src/index.ts"
   }
 }

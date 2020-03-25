@@ -6,7 +6,7 @@ More details about the project are available in the [filedrop-web](https://githu
 
 ## Installation
 
-Run `yarn install`, then simply run `yarn start`.
+Run `yarn install`, `yarn build` and then simply run `yarn start`. For development you can also run filedrop-ws with live reload, `yarn dev`.
 
 ## Configuration
 
@@ -14,15 +14,15 @@ Run `yarn install`, then simply run `yarn start`.
 
 The following variables are used for the configuration:
 
-| Variable          | Default value | Description                                                                       |
-|-------------------|---------------|-----------------------------------------------------------------------------------|
-| `WS_HOST`         | `127.0.0.1`   | IP address to bind to.                                                            |
-| `WS_PORT`         | `5000`        | Port to bind to.                                                                  |
-| `WS_BEHIND_PROXY` | `no`          | Set to `yes` if you want the application to respect the `X-Forwarded-For` header. |
-| `STUN_SERVER`     | `stun:stun.1.google.com:19302` | STUN server address.                      |
-| `TURN_MODE`       | `default`                      | `default` for static credentials, `hmac` for time-limited credentials. |
-| `TURN_SERVER`     | null                           | TURN server address.                      |
-| `TURN_USERNAME`   | null                           | TURN username.                            |
-| `TURN_CREDENTIAL` | null                           | TURN credential (password).               |
-| `TURN_SECRET`     | null                           | TURN secret (required for `hmac`).        |
-| `TURN_EXPIRY`     | `3600`                         | TURN token expiration time (when in `hmac` mode), in seconds. |
+| Variable          | Default value                  | Description                                                                       |
+| ----------------- | ------------------------------ | --------------------------------------------------------------------------------- |
+| `WS_HOST`         | `127.0.0.1`                    | IP address to bind to.                                                            |
+| `WS_PORT`         | `5000`                         | Port to bind to.                                                                  |
+| `WS_BEHIND_PROXY` | `no`                           | Set to `yes` if you want the application to respect the `X-Forwarded-For` header. |
+| `STUN_SERVER`     | `stun:stun.1.google.com:19302` | STUN server address.                                                              |
+| `TURN_MODE`       | `default`                      | `default` for static credentials, `hmac` for time-limited credentials.            |
+| `TURN_SERVER`     | null                           | TURN server address.                                                              |
+| `TURN_USERNAME`   | null                           | TURN username.                                                                    |
+| `TURN_CREDENTIAL` | null                           | TURN credential (password).                                                       |
+| `TURN_SECRET`     | null                           | TURN secret (required for `hmac`).                                                |
+| `TURN_EXPIRY`     | `3600`                         | TURN token expiration time (when in `hmac` mode), in seconds.                     |

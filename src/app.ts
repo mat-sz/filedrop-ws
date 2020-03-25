@@ -1,27 +1,23 @@
-require('dotenv-flow').config();
+import WebSocket from 'ws';
+
+import rtcConfiguration from './rtcConfiguration';
+import { Client } from './client';
 
 // Configuration
-const acceptForwardedFor =
-  process.env.WS_BEHIND_PROXY === 'true' ||
-  process.env.WS_BEHIND_PROXY === 'yes';
 const host = process.env.WS_HOST || '127.0.0.1';
-const port = process.env.WS_PORT || 5000;
+const port = parseInt(process.env.WS_PORT) || 5000;
 
-const WebSocket = require('ws');
 const wss = new WebSocket.Server({ host: host, port: port });
-const uuid = require('uuid/v4');
-const randomColor = require('randomcolor');
 
 const allowedActions = ['accept', 'reject', 'cancel'];
-const rtcConfiguration = require('./rtcConfiguration');
-let clients = [];
+let clients: Client[] = [];
 
-function networkMessage(networkName) {
+function networkMessage(networkName: string) {
   const networkClients = clients.filter(
     client => client.networkName === networkName
   );
   const network = networkClients
-    .sort((a, b) => b.firstSeen - a.firstSeen)
+    .sort((a, b) => b.firstSeen.getTime() - a.firstSeen.getTime())
     .map(client => {
       return {
         clientId: client.clientId,
@@ -41,59 +37,37 @@ function networkMessage(networkName) {
   });
 }
 
-function removeClient(client) {
-  client.setNetworkName(null);
+function removeClient(client: Client) {
+  client.setNetworkName(null, networkMessage);
   clients = clients.filter(c => c !== client);
 }
 
 wss.on('connection', (ws, req) => {
-  ws.clientId = uuid();
-  ws.clientColor = randomColor({ luminosity: 'light' });
-  ws.firstSeen = new Date();
-  ws.lastSeen = new Date();
-
-  const address =
-    acceptForwardedFor && req.headers['x-forwarded-for']
-      ? req.headers['x-forwarded-for']
-      : req.connection.remoteAddress;
-  ws.remoteAddress = address;
+  const client = new Client(ws, req);
 
   const localClients = clients
-    .filter(client => client.remoteAddress === address && client.networkName)
-    .sort((a, b) => b.lastSeen - a.lastSeen);
+    .filter(c => c.remoteAddress === client.remoteAddress && c.networkName)
+    .sort((a, b) => b.lastSeen.getTime() - a.lastSeen.getTime());
 
   let suggestedName = null;
   if (localClients.length > 0) {
     suggestedName = localClients[0].networkName;
   }
 
-  ws.setNetworkName = networkName => {
-    const previousName = ws.networkName;
-    ws.networkName = networkName;
-
-    if (previousName) {
-      networkMessage(previousName);
-    }
-
-    if (networkName) {
-      networkMessage(networkName);
-    }
-  };
-
-  clients.push(ws);
+  clients.push(client);
 
   ws.send(
     JSON.stringify({
       type: 'welcome',
-      clientId: ws.clientId,
-      clientColor: ws.clientColor,
+      clientId: client.clientId,
+      clientColor: client.clientColor,
       suggestedName: suggestedName,
-      rtcConfiguration: rtcConfiguration(ws.clientId),
+      rtcConfiguration: rtcConfiguration(client.clientId),
     })
   );
 
-  ws.on('message', data => {
-    ws.lastSeen = new Date();
+  ws.on('message', (data: string) => {
+    client.lastSeen = new Date();
 
     // Prevents DDoS and abuse.
     if (!data || data.length > 1024) return;
@@ -105,7 +79,10 @@ wss.on('connection', (ws, req) => {
         switch (json.type) {
           case 'name':
             if (json.networkName && typeof json.networkName === 'string') {
-              ws.setNetworkName(json.networkName.toUpperCase());
+              client.setNetworkName(
+                json.networkName.toUpperCase(),
+                networkMessage
+              );
             }
             break;
           case 'transfer':
@@ -121,11 +98,11 @@ wss.on('connection', (ws, req) => {
               json.targetId &&
               typeof json.targetId === 'string'
             ) {
-              json.clientId = ws.clientId;
+              json.clientId = client.clientId;
               data = JSON.stringify(json);
 
               const targets = clients.filter(
-                client => client.clientId === json.targetId && client !== ws
+                c => c.clientId === json.targetId && c !== client
               );
               targets.forEach(client => client.send(data));
             }
@@ -140,11 +117,11 @@ wss.on('connection', (ws, req) => {
               typeof json.targetId === 'string' &&
               allowedActions.includes(json.action)
             ) {
-              json.clientId = ws.clientId;
+              json.clientId = client.clientId;
               data = JSON.stringify(json);
 
               const targets = clients.filter(
-                client => client.clientId === json.targetId && client !== ws
+                c => c.clientId === json.targetId && c !== client
               );
               targets.forEach(client => client.send(data));
             }
@@ -162,11 +139,11 @@ wss.on('connection', (ws, req) => {
               json.transferId &&
               typeof json.transferId === 'string'
             ) {
-              json.clientId = ws.clientId;
+              json.clientId = client.clientId;
               data = JSON.stringify(json);
 
               const targets = clients.filter(
-                client => client.clientId === json.targetId && client !== ws
+                c => c.clientId === json.targetId && c !== client
               );
               targets.forEach(client => client.send(data));
             }
@@ -180,11 +157,11 @@ wss.on('connection', (ws, req) => {
               json.transferId &&
               typeof json.transferId === 'string'
             ) {
-              json.clientId = ws.clientId;
+              json.clientId = client.clientId;
               data = JSON.stringify(json);
 
               const targets = clients.filter(
-                client => client.clientId === json.targetId && client !== ws
+                c => c.clientId === json.targetId && c !== client
               );
               targets.forEach(client => client.send(data));
             }
@@ -195,7 +172,7 @@ wss.on('connection', (ws, req) => {
   });
 
   ws.on('close', () => {
-    removeClient(ws);
+    removeClient(client);
   });
 });
 
@@ -204,7 +181,7 @@ setInterval(() => {
     if (client.readyState <= 1) {
       return true;
     } else {
-      client.setNetworkName(null);
+      client.setNetworkName(null, networkMessage);
       return false;
     }
   });
@@ -242,3 +219,5 @@ setInterval(() => {
     }
   });
 }, 10000);
+
+console.log('Server running');

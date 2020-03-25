@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 const stunServer = process.env.STUN_SERVER || 'stun:stun.1.google.com:19302';
 const turnMode = process.env.TURN_MODE || 'default';
@@ -8,7 +8,7 @@ const turnCredential = process.env.TURN_CREDENTIAL || null;
 const turnSecret = process.env.TURN_SECRET || null;
 const turnExpiry = parseInt(process.env.TURN_EXPIRY) || 3600;
 
-module.exports = clientId => {
+const rtcConfiguration = (clientId: string) => {
   let iceServers = [];
 
   iceServers.push({
@@ -41,3 +41,5 @@ module.exports = clientId => {
     iceServers,
   };
 };
+
+export default rtcConfiguration;
