@@ -1,7 +1,8 @@
 import WebSocket from 'ws';
 
 import rtcConfiguration from './rtcConfiguration';
-import { Client } from './client';
+import { Client } from './Client';
+import { ClientManager } from './ClientManager';
 
 // Configuration
 const host = process.env.WS_HOST || '127.0.0.1';
@@ -10,65 +11,19 @@ const port = parseInt(process.env.WS_PORT) || 5000;
 const wss = new WebSocket.Server({ host: host, port: port });
 
 const allowedActions = ['accept', 'reject', 'cancel'];
-let clients: Client[] = [];
-
-function networkMessage(networkName: string) {
-  const networkClients = clients.filter(
-    client => client.networkName === networkName
-  );
-  const network = networkClients
-    .sort((a, b) => b.firstSeen.getTime() - a.firstSeen.getTime())
-    .map(client => {
-      return {
-        clientId: client.clientId,
-        clientColor: client.clientColor,
-      };
-    });
-
-  const networkMessage = JSON.stringify({
-    type: 'network',
-    clients: network,
-  });
-
-  networkClients.forEach(client => {
-    try {
-      client.send(networkMessage);
-    } catch {}
-  });
-}
-
-function sendMessage(clientId: string, message: any) {
-  if (!message.targetId || message.targetId === clientId) {
-    return;
-  }
-
-  const data = JSON.stringify({
-    ...message,
-    clientId: clientId,
-  });
-
-  const targets = clients.filter(c => c.clientId === message.targetId);
-  targets.forEach(client => client.send(data));
-}
-
-function removeClient(client: Client) {
-  client.setNetworkName(null, networkMessage);
-  clients = clients.filter(c => c !== client);
-}
+const clientManager = new ClientManager();
 
 wss.on('connection', (ws, req) => {
   const client = new Client(ws, req);
 
-  const localClients = clients
-    .filter(c => c.remoteAddress === client.remoteAddress && c.networkName)
-    .sort((a, b) => b.lastSeen.getTime() - a.lastSeen.getTime());
+  const localClients = clientManager.getLocalClients(client);
 
   let suggestedName = null;
   if (localClients.length > 0) {
     suggestedName = localClients[0].networkName;
   }
 
-  clients.push(client);
+  clientManager.addClient(client);
 
   ws.send(
     JSON.stringify({
@@ -95,7 +50,7 @@ wss.on('connection', (ws, req) => {
             if (json.networkName && typeof json.networkName === 'string') {
               client.setNetworkName(
                 json.networkName.toUpperCase(),
-                networkMessage
+                clientManager.sendNetworkMessage
               );
             }
             break;
@@ -112,7 +67,7 @@ wss.on('connection', (ws, req) => {
               json.targetId &&
               typeof json.targetId === 'string'
             ) {
-              sendMessage(client.clientId, json);
+              clientManager.sendMessage(client.clientId, json);
             }
             break;
           case 'action':
@@ -125,7 +80,7 @@ wss.on('connection', (ws, req) => {
               typeof json.targetId === 'string' &&
               allowedActions.includes(json.action)
             ) {
-              sendMessage(client.clientId, json);
+              clientManager.sendMessage(client.clientId, json);
             }
             break;
           case 'rtcDescription':
@@ -141,7 +96,7 @@ wss.on('connection', (ws, req) => {
               json.transferId &&
               typeof json.transferId === 'string'
             ) {
-              sendMessage(client.clientId, json);
+              clientManager.sendMessage(client.clientId, json);
             }
             break;
           case 'rtcCandidate':
@@ -153,7 +108,7 @@ wss.on('connection', (ws, req) => {
               json.transferId &&
               typeof json.transferId === 'string'
             ) {
-              sendMessage(client.clientId, json);
+              clientManager.sendMessage(client.clientId, json);
             }
             break;
         }
@@ -162,52 +117,22 @@ wss.on('connection', (ws, req) => {
   });
 
   ws.on('close', () => {
-    removeClient(client);
+    clientManager.removeClient(client);
   });
 });
 
 setInterval(() => {
-  clients = clients.filter(client => {
-    if (client.readyState <= 1) {
-      return true;
-    } else {
-      client.setNetworkName(null, networkMessage);
-      return false;
-    }
-  });
+  clientManager.removeBrokenClients();
 }, 1000);
 
 // Ping clients to keep the connection alive (when behind nginx)
 setInterval(() => {
-  const pingMessage = JSON.stringify({
-    type: 'ping',
-    timestamp: new Date().getTime(),
-  });
-
-  clients.forEach(client => {
-    if (client.readyState !== 1) return;
-
-    try {
-      client.send(pingMessage);
-    } catch {
-      removeClient(client);
-      client.close();
-    }
-  });
+  clientManager.pingClients();
 }, 5000);
 
 // Remove inactive connections
 setInterval(() => {
-  const minuteAgo = new Date(Date.now() - 1000 * 20);
-
-  clients.forEach(client => {
-    if (client.readyState !== 1) return;
-
-    if (client.lastSeen < minuteAgo) {
-      removeClient(client);
-      client.close();
-    }
-  });
+  clientManager.removeInactiveClients();
 }, 10000);
 
 console.log('Server running');
