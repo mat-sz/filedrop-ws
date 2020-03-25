@@ -4,11 +4,24 @@
   "private": true,
   "dependencies": {
     "dotenv-flow": "^3.1.0",
+    "husky": "^4.2.3",
+    "lint-staged": "^10.0.9",
+    "prettier": "^2.0.2",
     "randomcolor": "^0.5.4",
     "uuid": "^3.3.3",
     "ws": "^7.2.1"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --write"
+    ]
+  },
   "scripts": {
-    "start": "node index.js"
+    "start": "node src/index.js"
   }
 }
