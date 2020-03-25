@@ -37,6 +37,20 @@ function networkMessage(networkName: string) {
   });
 }
 
+function sendMessage(clientId: string, message: any) {
+  if (!message.targetId || message.targetId === clientId) {
+    return;
+  }
+
+  const data = JSON.stringify({
+    ...message,
+    clientId: clientId,
+  });
+
+  const targets = clients.filter(c => c.clientId === message.targetId);
+  targets.forEach(client => client.send(data));
+}
+
 function removeClient(client: Client) {
   client.setNetworkName(null, networkMessage);
   clients = clients.filter(c => c !== client);
@@ -98,13 +112,7 @@ wss.on('connection', (ws, req) => {
               json.targetId &&
               typeof json.targetId === 'string'
             ) {
-              json.clientId = client.clientId;
-              data = JSON.stringify(json);
-
-              const targets = clients.filter(
-                c => c.clientId === json.targetId && c !== client
-              );
-              targets.forEach(client => client.send(data));
+              sendMessage(client.clientId, json);
             }
             break;
           case 'action':
@@ -117,13 +125,7 @@ wss.on('connection', (ws, req) => {
               typeof json.targetId === 'string' &&
               allowedActions.includes(json.action)
             ) {
-              json.clientId = client.clientId;
-              data = JSON.stringify(json);
-
-              const targets = clients.filter(
-                c => c.clientId === json.targetId && c !== client
-              );
-              targets.forEach(client => client.send(data));
+              sendMessage(client.clientId, json);
             }
             break;
           case 'rtcDescription':
@@ -139,13 +141,7 @@ wss.on('connection', (ws, req) => {
               json.transferId &&
               typeof json.transferId === 'string'
             ) {
-              json.clientId = client.clientId;
-              data = JSON.stringify(json);
-
-              const targets = clients.filter(
-                c => c.clientId === json.targetId && c !== client
-              );
-              targets.forEach(client => client.send(data));
+              sendMessage(client.clientId, json);
             }
             break;
           case 'rtcCandidate':
@@ -157,13 +153,7 @@ wss.on('connection', (ws, req) => {
               json.transferId &&
               typeof json.transferId === 'string'
             ) {
-              json.clientId = client.clientId;
-              data = JSON.stringify(json);
-
-              const targets = clients.filter(
-                c => c.clientId === json.targetId && c !== client
-              );
-              targets.forEach(client => client.send(data));
+              sendMessage(client.clientId, json);
             }
             break;
         }
