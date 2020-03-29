@@ -10,5 +10,5 @@ RUN apk add --no-cache make gcc g++ python && \
 RUN yarn build
 
 EXPOSE 5000
-ENV IP 0.0.0.0
+ENV WS_HOST 0.0.0.0
 CMD ["yarn", "start"]
