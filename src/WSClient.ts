@@ -3,11 +3,13 @@ import randomColor from 'randomcolor';
 import { IncomingMessage } from 'http';
 import WebSocket from 'ws';
 
+import { Client } from './types/Client';
+
 const acceptForwardedFor =
   process.env.WS_BEHIND_PROXY === 'true' ||
   process.env.WS_BEHIND_PROXY === 'yes';
 
-export class Client {
+export class WSClient implements Client {
   readonly clientId = uuid();
   readonly clientColor = randomColor({ luminosity: 'light' });
   readonly firstSeen = new Date();

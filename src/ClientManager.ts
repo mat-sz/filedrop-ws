@@ -1,4 +1,4 @@
-import { Client } from './Client';
+import { Client } from './types/Client';
 import rtcConfiguration from './rtcConfiguration';
 import {
   isNameMessageModel,

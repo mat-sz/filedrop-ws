@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
 
-import { Client } from './Client';
+import { WSClient } from './WSClient';
 import { ClientManager } from './ClientManager';
 import { isMessageModel } from './types/typeChecking';
 
@@ -13,7 +13,7 @@ const wss = new WebSocket.Server({ host: host, port: port });
 const clientManager = new ClientManager();
 
 wss.on('connection', (ws, req) => {
-  const client = new Client(ws, req);
+  const client = new WSClient(ws, req);
   clientManager.addClient(client);
 
   ws.on('message', (data: string) => {
