@@ -1,8 +1,8 @@
 import WebSocket from 'ws';
 
-import rtcConfiguration from './rtcConfiguration';
 import { Client } from './Client';
 import { ClientManager } from './ClientManager';
+import { isMessageModel } from './types/typeChecking';
 
 // Configuration
 const host = process.env.WS_HOST || '127.0.0.1';
@@ -21,10 +21,10 @@ wss.on('connection', (ws, req) => {
     if (!data || data.length > 1024) return;
 
     try {
-      const json = JSON.parse(data);
+      const message = JSON.parse(data);
 
-      if (json && json.type && typeof json.type === 'string') {
-        clientManager.handleMessage(client, json);
+      if (isMessageModel(message)) {
+        clientManager.handleMessage(client, message);
       }
     } catch (e) {}
   });

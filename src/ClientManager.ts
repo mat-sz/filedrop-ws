@@ -1,7 +1,13 @@
 import { Client } from './Client';
 import rtcConfiguration from './rtcConfiguration';
-
-const allowedActions = ['accept', 'reject', 'cancel'];
+import {
+  isNameMessageModel,
+  isTransferMessageModel,
+  isActionMessageModel,
+  isRTCDescriptionMessageModel,
+  isRTCCandidateMessageModel,
+} from './types/typeChecking';
+import { MessageModel, TargetedMessageModel } from './types/Models';
 
 export class ClientManager {
   private clients: Client[] = [];
@@ -31,79 +37,25 @@ export class ClientManager {
     );
   }
 
-  handleMessage(client: Client, message: any) {
+  handleMessage(client: Client, message: MessageModel) {
     client.lastSeen = new Date();
 
-    switch (message.type) {
-      case 'name':
-        if (message.networkName && typeof message.networkName === 'string') {
-          client.setNetworkName(
-            message.networkName.toUpperCase(),
-            this.sendNetworkMessage
-          );
-        }
-        break;
-      case 'transfer':
-        if (
-          message.transferId &&
-          typeof message.transferId === 'string' &&
-          message.fileName &&
-          typeof message.fileName === 'string' &&
-          message.fileSize &&
-          typeof message.fileSize === 'number' &&
-          message.fileType &&
-          typeof message.fileType === 'string' &&
-          message.targetId &&
-          typeof message.targetId === 'string'
-        ) {
-          this.sendMessage(client.clientId, message);
-        }
-        break;
-      case 'action':
-        if (
-          message.transferId &&
-          typeof message.transferId === 'string' &&
-          message.action &&
-          typeof message.action === 'string' &&
-          message.targetId &&
-          typeof message.targetId === 'string' &&
-          allowedActions.includes(message.action)
-        ) {
-          this.sendMessage(client.clientId, message);
-        }
-        break;
-      case 'rtcDescription':
-        if (
-          message.data &&
-          typeof message.data === 'object' &&
-          message.data.type &&
-          typeof message.data.type === 'string' &&
-          message.data.sdp &&
-          typeof message.data.sdp === 'string' &&
-          message.targetId &&
-          typeof message.targetId === 'string' &&
-          message.transferId &&
-          typeof message.transferId === 'string'
-        ) {
-          this.sendMessage(client.clientId, message);
-        }
-        break;
-      case 'rtcCandidate':
-        if (
-          message.data &&
-          typeof message.data === 'object' &&
-          message.targetId &&
-          typeof message.targetId === 'string' &&
-          message.transferId &&
-          typeof message.transferId === 'string'
-        ) {
-          this.sendMessage(client.clientId, message);
-        }
-        break;
+    if (isNameMessageModel(message)) {
+      client.setNetworkName(
+        message.networkName.toUpperCase(),
+        this.sendNetworkMessage
+      );
+    } else if (
+      isTransferMessageModel(message) ||
+      isActionMessageModel(message) ||
+      isRTCDescriptionMessageModel(message) ||
+      isRTCCandidateMessageModel(message)
+    ) {
+      this.sendMessage(client.clientId, message);
     }
   }
 
-  sendMessage(fromClientId: string, message: any) {
+  sendMessage(fromClientId: string, message: TargetedMessageModel) {
     if (!message.targetId || message.targetId === fromClientId) {
       return;
     }
