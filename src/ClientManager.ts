@@ -1,4 +1,5 @@
 import { Client } from './Client';
+import rtcConfiguration from './rtcConfiguration';
 
 const allowedActions = ['accept', 'reject', 'cancel'];
 
@@ -10,7 +11,24 @@ export class ClientManager {
   }
 
   addClient(client: Client) {
+    const localClients = this.getLocalClients(client);
+
+    let suggestedName = null;
+    if (localClients.length > 0) {
+      suggestedName = localClients[0].networkName;
+    }
+
     this.clients.push(client);
+
+    client.send(
+      JSON.stringify({
+        type: 'welcome',
+        clientId: client.clientId,
+        clientColor: client.clientColor,
+        suggestedName: suggestedName,
+        rtcConfiguration: rtcConfiguration(client.clientId),
+      })
+    );
   }
 
   handleMessage(client: Client, message: any) {
@@ -85,14 +103,14 @@ export class ClientManager {
     }
   }
 
-  sendMessage(clientId: string, message: any) {
-    if (!message.targetId || message.targetId === clientId) {
+  sendMessage(fromClientId: string, message: any) {
+    if (!message.targetId || message.targetId === fromClientId) {
       return;
     }
 
     const data = JSON.stringify({
       ...message,
-      clientId: clientId,
+      clientId: fromClientId,
     });
 
     const targets = this.clients.filter(c => c.clientId === message.targetId);

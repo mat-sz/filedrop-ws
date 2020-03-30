@@ -14,25 +14,7 @@ const clientManager = new ClientManager();
 
 wss.on('connection', (ws, req) => {
   const client = new Client(ws, req);
-
-  const localClients = clientManager.getLocalClients(client);
-
-  let suggestedName = null;
-  if (localClients.length > 0) {
-    suggestedName = localClients[0].networkName;
-  }
-
   clientManager.addClient(client);
-
-  ws.send(
-    JSON.stringify({
-      type: 'welcome',
-      clientId: client.clientId,
-      clientColor: client.clientColor,
-      suggestedName: suggestedName,
-      rtcConfiguration: rtcConfiguration(client.clientId),
-    })
-  );
 
   ws.on('message', (data: string) => {
     // Prevents DDoS and abuse.
