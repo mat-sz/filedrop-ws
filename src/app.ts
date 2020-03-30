@@ -10,7 +10,6 @@ const port = parseInt(process.env.WS_PORT) || 5000;
 
 const wss = new WebSocket.Server({ host: host, port: port });
 
-const allowedActions = ['accept', 'reject', 'cancel'];
 const clientManager = new ClientManager();
 
 wss.on('connection', (ws, req) => {
@@ -36,8 +35,6 @@ wss.on('connection', (ws, req) => {
   );
 
   ws.on('message', (data: string) => {
-    client.lastSeen = new Date();
-
     // Prevents DDoS and abuse.
     if (!data || data.length > 1024) return;
 
@@ -45,73 +42,7 @@ wss.on('connection', (ws, req) => {
       const json = JSON.parse(data);
 
       if (json && json.type && typeof json.type === 'string') {
-        switch (json.type) {
-          case 'name':
-            if (json.networkName && typeof json.networkName === 'string') {
-              client.setNetworkName(
-                json.networkName.toUpperCase(),
-                clientManager.sendNetworkMessage
-              );
-            }
-            break;
-          case 'transfer':
-            if (
-              json.transferId &&
-              typeof json.transferId === 'string' &&
-              json.fileName &&
-              typeof json.fileName === 'string' &&
-              json.fileSize &&
-              typeof json.fileSize === 'number' &&
-              json.fileType &&
-              typeof json.fileType === 'string' &&
-              json.targetId &&
-              typeof json.targetId === 'string'
-            ) {
-              clientManager.sendMessage(client.clientId, json);
-            }
-            break;
-          case 'action':
-            if (
-              json.transferId &&
-              typeof json.transferId === 'string' &&
-              json.action &&
-              typeof json.action === 'string' &&
-              json.targetId &&
-              typeof json.targetId === 'string' &&
-              allowedActions.includes(json.action)
-            ) {
-              clientManager.sendMessage(client.clientId, json);
-            }
-            break;
-          case 'rtcDescription':
-            if (
-              json.data &&
-              typeof json.data === 'object' &&
-              json.data.type &&
-              typeof json.data.type === 'string' &&
-              json.data.sdp &&
-              typeof json.data.sdp === 'string' &&
-              json.targetId &&
-              typeof json.targetId === 'string' &&
-              json.transferId &&
-              typeof json.transferId === 'string'
-            ) {
-              clientManager.sendMessage(client.clientId, json);
-            }
-            break;
-          case 'rtcCandidate':
-            if (
-              json.data &&
-              typeof json.data === 'object' &&
-              json.targetId &&
-              typeof json.targetId === 'string' &&
-              json.transferId &&
-              typeof json.transferId === 'string'
-            ) {
-              clientManager.sendMessage(client.clientId, json);
-            }
-            break;
-        }
+        clientManager.handleMessage(client, json);
       }
     } catch (e) {}
   });

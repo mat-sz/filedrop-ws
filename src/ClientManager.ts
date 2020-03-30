@@ -1,7 +1,6 @@
-import WebSocket from 'ws';
-import { IncomingMessage } from 'http';
-
 import { Client } from './Client';
+
+const allowedActions = ['accept', 'reject', 'cancel'];
 
 export class ClientManager {
   private clients: Client[] = [];
@@ -12,6 +11,78 @@ export class ClientManager {
 
   addClient(client: Client) {
     this.clients.push(client);
+  }
+
+  handleMessage(client: Client, message: any) {
+    client.lastSeen = new Date();
+
+    switch (message.type) {
+      case 'name':
+        if (message.networkName && typeof message.networkName === 'string') {
+          client.setNetworkName(
+            message.networkName.toUpperCase(),
+            this.sendNetworkMessage
+          );
+        }
+        break;
+      case 'transfer':
+        if (
+          message.transferId &&
+          typeof message.transferId === 'string' &&
+          message.fileName &&
+          typeof message.fileName === 'string' &&
+          message.fileSize &&
+          typeof message.fileSize === 'number' &&
+          message.fileType &&
+          typeof message.fileType === 'string' &&
+          message.targetId &&
+          typeof message.targetId === 'string'
+        ) {
+          this.sendMessage(client.clientId, message);
+        }
+        break;
+      case 'action':
+        if (
+          message.transferId &&
+          typeof message.transferId === 'string' &&
+          message.action &&
+          typeof message.action === 'string' &&
+          message.targetId &&
+          typeof message.targetId === 'string' &&
+          allowedActions.includes(message.action)
+        ) {
+          this.sendMessage(client.clientId, message);
+        }
+        break;
+      case 'rtcDescription':
+        if (
+          message.data &&
+          typeof message.data === 'object' &&
+          message.data.type &&
+          typeof message.data.type === 'string' &&
+          message.data.sdp &&
+          typeof message.data.sdp === 'string' &&
+          message.targetId &&
+          typeof message.targetId === 'string' &&
+          message.transferId &&
+          typeof message.transferId === 'string'
+        ) {
+          this.sendMessage(client.clientId, message);
+        }
+        break;
+      case 'rtcCandidate':
+        if (
+          message.data &&
+          typeof message.data === 'object' &&
+          message.targetId &&
+          typeof message.targetId === 'string' &&
+          message.transferId &&
+          typeof message.transferId === 'string'
+        ) {
+          this.sendMessage(client.clientId, message);
+        }
+        break;
+    }
   }
 
   sendMessage(clientId: string, message: any) {
