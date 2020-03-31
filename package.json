@@ -3,15 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@types/jest": "^25.1.4",
     "@types/node": "^12.12.31",
     "@types/randomcolor": "^0.5.4",
     "@types/uuid": "^7.0.2",
     "@types/ws": "^7.2.3",
     "dotenv-flow": "^3.1.0",
     "husky": "^4.2.3",
+    "jest": "^25.2.4",
     "lint-staged": "^10.0.9",
     "prettier": "^2.0.2",
     "randomcolor": "^0.5.4",
+    "ts-jest": "^25.3.0",
     "ts-node-dev": "^1.0.0-pre.44",
     "typescript": "^3.8.3",
     "uuid": "^7.0.2",
@@ -24,6 +27,9 @@
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --write"
+    ],
+    "__tests__/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
       "prettier --write"
     ]
   },
