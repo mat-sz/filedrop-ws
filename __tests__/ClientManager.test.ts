@@ -3,6 +3,8 @@ import randomColor from 'randomcolor';
 
 import { ClientManager } from '../src/ClientManager';
 import { Client } from '../src/types/Client';
+import { MessageType, ActionMessageActionType } from '../src/types/MessageType';
+import { TargetedMessageModel, ActionMessageModel } from '../src/types/Models';
 
 export class TestClient implements Client {
   readonly clientId = uuid();
@@ -45,7 +47,7 @@ describe('ClientManager', () => {
     clientManager.addClient(client);
 
     expect(JSON.parse(client.lastMessage)).toMatchObject({
-      type: 'welcome',
+      type: MessageType.WELCOME,
       clientId: client.clientId,
       clientColor: client.clientColor,
     });
@@ -95,5 +97,76 @@ describe('ClientManager', () => {
         }),
       ])
     );
+  });
+
+  it('pings clients', async () => {
+    const clientManager = new ClientManager();
+
+    const client1 = new TestClient();
+    clientManager.addClient(client1);
+
+    const client2 = new TestClient();
+    clientManager.addClient(client2);
+
+    const client3 = new TestClient();
+    clientManager.addClient(client3);
+
+    clientManager.pingClients();
+
+    expect(JSON.parse(client1.lastMessage)).toMatchObject({
+      type: MessageType.PING,
+    });
+
+    expect(JSON.parse(client2.lastMessage)).toMatchObject({
+      type: MessageType.PING,
+    });
+
+    expect(JSON.parse(client3.lastMessage)).toMatchObject({
+      type: MessageType.PING,
+    });
+  });
+
+  it('relays messages to target clients', async () => {
+    const clientManager = new ClientManager();
+
+    const client1 = new TestClient();
+    clientManager.addClient(client1);
+
+    const client2 = new TestClient();
+    clientManager.addClient(client2);
+
+    const targetedMessage: ActionMessageModel = {
+      type: MessageType.ACTION,
+      action: ActionMessageActionType.ACCEPT,
+      targetId: client2.clientId,
+      transferId: 'test',
+    };
+
+    clientManager.handleMessage(client1, targetedMessage);
+
+    expect(JSON.parse(client2.lastMessage)).toMatchObject({
+      type: MessageType.ACTION,
+    });
+  });
+
+  it('drops invalid messages', async () => {
+    const clientManager = new ClientManager();
+
+    const client1 = new TestClient();
+    clientManager.addClient(client1);
+
+    const client2 = new TestClient();
+    clientManager.addClient(client2);
+
+    const targetedMessage: TargetedMessageModel = {
+      type: MessageType.ACTION,
+      targetId: client2.clientId,
+    };
+
+    clientManager.handleMessage(client1, targetedMessage);
+
+    expect(JSON.parse(client2.lastMessage)).toMatchObject({
+      type: MessageType.WELCOME,
+    });
   });
 });
