@@ -36,6 +36,7 @@
   "scripts": {
     "start": "node build/index.js",
     "build": "tsc",
+    "test": "jest",
     "dev": "ts-node-dev --respawn --transpileOnly src/index.ts"
   }
 }
