@@ -8,6 +8,7 @@ import {
   isRTCCandidateMessageModel,
 } from './types/typeChecking';
 import { MessageModel, TargetedMessageModel } from './types/Models';
+import { MessageType } from './types/MessageType';
 
 export class ClientManager {
   private clients: Client[] = [];
@@ -28,7 +29,7 @@ export class ClientManager {
 
     client.send(
       JSON.stringify({
-        type: 'welcome',
+        type: MessageType.WELCOME,
         clientId: client.clientId,
         clientColor: client.clientColor,
         suggestedName: suggestedName,
@@ -84,7 +85,7 @@ export class ClientManager {
       });
 
     const networkMessage = JSON.stringify({
-      type: 'network',
+      type: MessageType.NETWORK,
       clients: network,
     });
 
@@ -103,7 +104,7 @@ export class ClientManager {
 
   pingClients() {
     const pingMessage = JSON.stringify({
-      type: 'ping',
+      type: MessageType.PING,
       timestamp: new Date().getTime(),
     });
 
