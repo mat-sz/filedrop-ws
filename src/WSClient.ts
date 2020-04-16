@@ -39,6 +39,10 @@ export class WSClient implements Client {
   }
 
   send(data: string) {
+    if (this.ws.readyState !== 1) {
+      return;
+    }
+
     this.ws.send(data);
   }
 
