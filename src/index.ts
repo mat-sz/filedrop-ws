@@ -1,2 +1,5 @@
-require('dotenv-flow').config();
-require('./app');
+import dotenv from 'dotenv-flow';
+import App from './app';
+
+dotenv.config();
+App();

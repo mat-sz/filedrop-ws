@@ -9,7 +9,7 @@ const turnSecret = process.env.TURN_SECRET || null;
 const turnExpiry = parseInt(process.env.TURN_EXPIRY) || 3600;
 
 const rtcConfiguration = (clientId: string) => {
-  let iceServers = [];
+  const iceServers = [];
 
   iceServers.push({
     urls: stunServer,
