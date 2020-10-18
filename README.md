@@ -4,6 +4,10 @@ WebSockets server for [filedrop-web](https://github.com/mat-sz/filedrop-web).
 
 More details about the project are available in the [filedrop-web](https://github.com/mat-sz/filedrop-web) repository.
 
+## Self-hosting
+
+Please refer to the [Self-hosting](https://github.com/mat-sz/filedrop-web#self-hosting) section in the [filedrop-web](https://github.com/mat-sz/filedrop-web) README.
+
 ## Installation
 
 Run `yarn install`, `yarn build` and then simply run `yarn start`. For development you can also run filedrop-ws with live reload, `yarn dev`.
