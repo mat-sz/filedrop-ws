@@ -47,11 +47,21 @@ export class ClientManager {
         this.sendNetworkMessage
       );
     } else if (
-      isTransferMessageModel(message) ||
       isActionMessageModel(message) ||
       isRTCDescriptionMessageModel(message) ||
       isRTCCandidateMessageModel(message)
     ) {
+      this.sendMessage(client.clientId, message);
+    } else if (isTransferMessageModel(message)) {
+      // Ensure all previews are data URLs for safety.
+      if (
+        message.preview &&
+        (typeof message.preview !== 'string' ||
+          !message.preview.startsWith('data:'))
+      ) {
+        return;
+      }
+
       this.sendMessage(client.clientId, message);
     }
   }

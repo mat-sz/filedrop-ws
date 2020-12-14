@@ -33,6 +33,7 @@ export interface TransferMessageModel extends TargetedMessageModel {
   fileSize: number;
   fileType: string;
   clientId?: string;
+  preview?: string;
 }
 
 export interface ActionMessageModel extends TargetedMessageModel {
