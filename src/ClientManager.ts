@@ -7,8 +7,14 @@ import {
   isRTCDescriptionMessageModel,
   isRTCCandidateMessageModel,
 } from './types/typeChecking';
-import { MessageModel, TargetedMessageModel } from './types/Models';
+import {
+  MessageModel,
+  TargetedMessageModel,
+  WelcomeMessageModel,
+} from './types/Models';
 import { MessageType } from './types/MessageType';
+
+export const maxSize = parseInt(process.env.WS_MAX_SIZE) || 65536;
 
 export class ClientManager {
   private clients: Client[] = [];
@@ -34,7 +40,8 @@ export class ClientManager {
         clientColor: client.clientColor,
         suggestedName: suggestedName,
         rtcConfiguration: rtcConfiguration(client.clientId),
-      })
+        maxSize,
+      } as WelcomeMessageModel)
     );
   }
 

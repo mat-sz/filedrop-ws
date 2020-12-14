@@ -1,14 +1,13 @@
 import WebSocket from 'ws';
 
 import { WSClient } from './WSClient';
-import { ClientManager } from './ClientManager';
+import { ClientManager, maxSize } from './ClientManager';
 import { isMessageModel } from './types/typeChecking';
 
 export default function App() {
   // Configuration
   const host = process.env.WS_HOST || '127.0.0.1';
   const port = parseInt(process.env.WS_PORT) || 5000;
-  const maxSize = parseInt(process.env.WS_MAX_SIZE) || 65536;
 
   const wss = new WebSocket.Server({ host: host, port: port });
 
