@@ -8,6 +8,7 @@ export default function App() {
   // Configuration
   const host = process.env.WS_HOST || '127.0.0.1';
   const port = parseInt(process.env.WS_PORT) || 5000;
+  const maxSize = parseInt(process.env.WS_MAX_SIZE) || 65536;
 
   const wss = new WebSocket.Server({ host: host, port: port });
 
@@ -19,7 +20,7 @@ export default function App() {
 
     ws.on('message', (data: string) => {
       // Prevents DDoS and abuse.
-      if (!data || data.length > 1024) return;
+      if (!data || data.length > maxSize) return;
 
       try {
         const message = JSON.parse(data);
