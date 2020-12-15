@@ -22,7 +22,7 @@ export class WSClient implements Client {
       acceptForwardedFor && req.headers['x-forwarded-for']
         ? req.headers['x-forwarded-for']
         : req.connection.remoteAddress;
-    this.remoteAddress = Array.isArray(address) ? address[0] : address;
+    this.remoteAddress = typeof address === 'string' ? address : address[0];
   }
 
   setNetworkName(networkName: string, networkMessage: (name: string) => void) {
