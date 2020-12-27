@@ -15,6 +15,8 @@ import {
 import { MessageType } from './types/MessageType';
 
 export const maxSize = parseInt(process.env.WS_MAX_SIZE) || 65536;
+export const noticeText = process.env.NOTICE_TEXT;
+export const noticeUrl = process.env.NOTICE_URL;
 
 export class ClientManager {
   private clients: Client[] = [];
@@ -41,6 +43,8 @@ export class ClientManager {
         suggestedName: suggestedName,
         rtcConfiguration: rtcConfiguration(client.clientId),
         maxSize,
+        noticeText,
+        noticeUrl,
       } as WelcomeMessageModel)
     );
   }

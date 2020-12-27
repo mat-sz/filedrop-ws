@@ -31,3 +31,5 @@ The following variables are used for the configuration:
 | `TURN_CREDENTIAL` | null                           | TURN credential (password).                                                       |
 | `TURN_SECRET`     | null                           | TURN secret (required for `hmac`).                                                |
 | `TURN_EXPIRY`     | `3600`                         | TURN token expiration time (when in `hmac` mode), in seconds.                     |
+| `NOTICE_TEXT`     | null                           | Text of the notice to be displayed for all clients.                               |
+| `NOTICE_URL`      | null                           | URL the notice should link to.                                                    |
