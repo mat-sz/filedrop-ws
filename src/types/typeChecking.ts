@@ -95,6 +95,8 @@ export function isEncryptedMessageModel(
     message.type === MessageType.ENCRYPTED &&
     'payload' in message &&
     typeof message['payload'] === 'string' &&
+    'secret' in message &&
+    typeof message['secret'] === 'string' &&
     'targetId' in message &&
     typeof message['targetId'] === 'string'
   );
