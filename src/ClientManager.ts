@@ -6,9 +6,12 @@ import {
   isActionMessageModel,
   isRTCDescriptionMessageModel,
   isRTCCandidateMessageModel,
+  isEncryptedMessageModel,
 } from './types/typeChecking';
 import {
+  ClientModel,
   MessageModel,
+  NetworkMessageModel,
   TargetedMessageModel,
   WelcomeMessageModel,
 } from './types/Models';
@@ -57,10 +60,12 @@ export class ClientManager {
         message.networkName.toUpperCase(),
         this.sendNetworkMessage
       );
+      client.publicKey = message.publicKey;
     } else if (
       isActionMessageModel(message) ||
       isRTCDescriptionMessageModel(message) ||
-      isRTCCandidateMessageModel(message)
+      isRTCCandidateMessageModel(message) ||
+      isEncryptedMessageModel(message)
     ) {
       this.sendMessage(client.clientId, message);
     } else if (isTransferMessageModel(message)) {
@@ -96,19 +101,20 @@ export class ClientManager {
       client => client.networkName === networkName
     );
 
-    const network = networkClients
+    const network: ClientModel[] = networkClients
       .sort((a, b) => b.firstSeen.getTime() - a.firstSeen.getTime())
       .map(client => {
         return {
           clientId: client.clientId,
           clientColor: client.clientColor,
+          publicKey: client.publicKey,
         };
       });
 
     const networkMessage = JSON.stringify({
       type: MessageType.NETWORK,
       clients: network,
-    });
+    } as NetworkMessageModel);
 
     networkClients.forEach(client => {
       try {

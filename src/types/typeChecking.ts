@@ -5,6 +5,7 @@ import {
   ActionMessageModel,
   RTCDescriptionMessageModel,
   RTCCandidateMessageModel,
+  EncryptedMessageModel,
 } from './Models';
 import { MessageType, ActionMessageActionType } from './MessageType';
 
@@ -84,5 +85,17 @@ export function isRTCCandidateMessageModel(
     typeof message['targetId'] === 'string' &&
     'transferId' in message &&
     typeof message['transferId'] === 'string'
+  );
+}
+
+export function isEncryptedMessageModel(
+  message: MessageModel
+): message is EncryptedMessageModel {
+  return (
+    message.type === MessageType.ENCRYPTED &&
+    'payload' in message &&
+    typeof message['payload'] === 'string' &&
+    'targetId' in message &&
+    typeof message['targetId'] === 'string'
   );
 }

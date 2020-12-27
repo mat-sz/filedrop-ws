@@ -6,6 +6,7 @@ export interface Client {
   readonly remoteAddress: string;
   networkName: string;
   readonly readyState: number;
+  publicKey?: string;
 
   setNetworkName(
     networkName: string,

@@ -3,6 +3,7 @@ import { MessageType, ActionMessageActionType } from './MessageType';
 export interface ClientModel {
   clientId: string;
   clientColor: string;
+  publicKey?: string;
 }
 
 export interface MessageModel {
@@ -27,6 +28,7 @@ export interface WelcomeMessageModel extends MessageModel {
 export interface NameMessageModel extends MessageModel {
   type: MessageType.NAME;
   networkName: string;
+  publicKey?: string;
 }
 
 export interface TransferMessageModel extends TargetedMessageModel {
@@ -68,4 +70,9 @@ export interface RTCCandidateMessageModel extends TargetedMessageModel {
   data: any;
   transferId: string;
   clientId?: string;
+}
+
+export interface EncryptedMessageModel extends TargetedMessageModel {
+  type: MessageType.ENCRYPTED;
+  payload: string;
 }
