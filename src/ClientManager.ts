@@ -56,11 +56,11 @@ export class ClientManager {
     client.lastSeen = new Date();
 
     if (isNameMessageModel(message)) {
+      client.publicKey = message.publicKey;
       client.setNetworkName(
         message.networkName.toUpperCase(),
         this.sendNetworkMessage
       );
-      client.publicKey = message.publicKey;
     } else if (
       isActionMessageModel(message) ||
       isRTCDescriptionMessageModel(message) ||
