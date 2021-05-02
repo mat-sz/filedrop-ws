@@ -19,6 +19,10 @@ wss.on('connection', (ws, req) => {
   const client = new WSClient(ws, req);
   clientManager.addClient(client);
 
+  ws.on('error', error => {
+    console.log('[ERROR (Handled)]', error.message);
+  });
+
   ws.on('message', (data: string) => {
     // Prevents DDoS and abuse.
     if (!data || data.length > maxSize) return;
