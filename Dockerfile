@@ -4,9 +4,7 @@ WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 COPY . /app
 
-RUN apk add --no-cache make gcc g++ python && \
-  yarn install && \
-  apk del make gcc g++ python
+RUN yarn install
 RUN yarn build
 
 EXPOSE 5000
