@@ -14,7 +14,7 @@ export function isMessageModel(message: any): message is MessageModel {
 }
 
 export function isNameMessageModel(
-  message: MessageModel
+  message: MessageModel | NameMessageModel
 ): message is NameMessageModel {
   return (
     message.type === MessageType.NAME &&
@@ -24,7 +24,7 @@ export function isNameMessageModel(
 }
 
 export function isTransferMessageModel(
-  message: MessageModel
+  message: MessageModel | TransferMessageModel
 ): message is TransferMessageModel {
   return (
     message.type === MessageType.TRANSFER &&
@@ -42,7 +42,7 @@ export function isTransferMessageModel(
 }
 
 export function isActionMessageModel(
-  message: MessageModel
+  message: MessageModel | ActionMessageModel
 ): message is ActionMessageModel {
   return (
     message.type === MessageType.ACTION &&
@@ -57,7 +57,7 @@ export function isActionMessageModel(
 }
 
 export function isRTCDescriptionMessageModel(
-  message: MessageModel
+  message: MessageModel | RTCDescriptionMessageModel
 ): message is RTCDescriptionMessageModel {
   return (
     message.type === MessageType.RTC_DESCRIPTION &&
@@ -75,7 +75,7 @@ export function isRTCDescriptionMessageModel(
 }
 
 export function isRTCCandidateMessageModel(
-  message: MessageModel
+  message: MessageModel | RTCCandidateMessageModel
 ): message is RTCCandidateMessageModel {
   return (
     message.type === MessageType.RTC_CANDIDATE &&
@@ -89,7 +89,7 @@ export function isRTCCandidateMessageModel(
 }
 
 export function isEncryptedMessageModel(
-  message: MessageModel
+  message: MessageModel | EncryptedMessageModel
 ): message is EncryptedMessageModel {
   return (
     message.type === MessageType.ENCRYPTED &&
