@@ -14,11 +14,14 @@ import { MessageType, ActionMessageActionType } from '../types/MessageType';
 
 const messageModelSchema = Joi.object({
   type: Joi.string().alphanum().required(),
-}).required();
+})
+  .unknown(true)
+  .required();
 
 const networkNameMessageModelSchema = Joi.object({
   type: Joi.string().equal(MessageType.NETWORK_NAME).required(),
   networkName: Joi.string().alphanum().max(10).required(),
+  publicKey: Joi.string(),
 }).required();
 
 const clientNameMessageModelSchema = Joi.object({
