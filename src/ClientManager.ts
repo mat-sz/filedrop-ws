@@ -1,5 +1,5 @@
 import { Client } from './types/Client';
-import rtcConfiguration from './rtcConfiguration';
+import { rtcConfiguration } from './utils/rtcConfiguration';
 import {
   isNameMessageModel,
   isTransferMessageModel,
@@ -17,7 +17,8 @@ import {
 } from './types/Models';
 import { MessageType } from './types/MessageType';
 
-export const maxSize = parseInt(process.env.WS_MAX_SIZE) || 65536;
+export const maxClientNameLength = 32;
+export const maxSize = parseInt(process.env.WS_MAX_SIZE || '65536');
 export const noticeText = process.env.NOTICE_TEXT;
 export const noticeUrl = process.env.NOTICE_URL;
 
@@ -31,9 +32,9 @@ export class ClientManager {
   addClient(client: Client) {
     const localClients = this.getLocalClients(client);
 
-    let suggestedName = null;
+    let suggestedNetworkName = null;
     if (localClients.length > 0) {
-      suggestedName = localClients[0].networkName;
+      suggestedNetworkName = localClients[0].networkName;
     }
 
     this.clients.push(client);
@@ -43,7 +44,8 @@ export class ClientManager {
         type: MessageType.WELCOME,
         clientId: client.clientId,
         clientColor: client.clientColor,
-        suggestedName: suggestedName,
+        clientName: client.clientName,
+        suggestedNetworkName: suggestedNetworkName,
         rtcConfiguration: rtcConfiguration(client.clientId),
         maxSize,
         noticeText,
@@ -59,6 +61,7 @@ export class ClientManager {
       client.publicKey = message.publicKey;
       client.setNetworkName(
         message.networkName.toUpperCase(),
+        message.clientName.substring(0, maxClientNameLength),
         this.sendNetworkMessage
       );
     } else if (
@@ -107,6 +110,7 @@ export class ClientManager {
         return {
           clientId: client.clientId,
           clientColor: client.clientColor,
+          clientName: client.clientName,
           publicKey: client.publicKey,
         };
       });
@@ -148,7 +152,7 @@ export class ClientManager {
   }
 
   removeClient(client: Client) {
-    client.setNetworkName(null, this.sendNetworkMessage);
+    client.setNetworkName(null, null, this.sendNetworkMessage);
     this.clients = this.clients.filter(c => c !== client);
   }
 
@@ -157,7 +161,7 @@ export class ClientManager {
       if (client.readyState <= 1) {
         return true;
       } else {
-        client.setNetworkName(null, this.sendNetworkMessage);
+        client.setNetworkName(null, null, this.sendNetworkMessage);
         return false;
       }
     });

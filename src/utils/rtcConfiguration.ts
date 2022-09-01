@@ -6,9 +6,9 @@ const turnServer = process.env.TURN_SERVER || null;
 const turnUsername = process.env.TURN_USERNAME || null;
 const turnCredential = process.env.TURN_CREDENTIAL || null;
 const turnSecret = process.env.TURN_SECRET || null;
-const turnExpiry = parseInt(process.env.TURN_EXPIRY) || 3600;
+const turnExpiry = parseInt(process.env.TURN_EXPIRY || '3600');
 
-const rtcConfiguration = (clientId: string) => {
+export const rtcConfiguration = (clientId: string) => {
   const iceServers = [];
 
   iceServers.push({
@@ -41,5 +41,3 @@ const rtcConfiguration = (clientId: string) => {
     iceServers,
   };
 };
-
-export default rtcConfiguration;

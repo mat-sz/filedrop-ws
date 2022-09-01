@@ -19,7 +19,9 @@ export function isNameMessageModel(
   return (
     message.type === MessageType.NAME &&
     'networkName' in message &&
-    typeof message['networkName'] === 'string'
+    typeof message['networkName'] === 'string' &&
+    'clientName' in message &&
+    typeof message['clientName'] === 'string'
   );
 }
 

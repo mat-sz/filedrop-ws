@@ -3,23 +3,30 @@ import randomColor from 'randomcolor';
 
 import { ClientManager } from '../src/ClientManager';
 import { Client } from '../src/types/Client';
+import { generateClientName } from '../src/utils/name';
 import { MessageType, ActionMessageActionType } from '../src/types/MessageType';
 import { TargetedMessageModel, ActionMessageModel } from '../src/types/Models';
 
 export class TestClient implements Client {
   readonly clientId = uuid();
   readonly clientColor = randomColor({ luminosity: 'light' });
+  clientName = generateClientName();
   readonly firstSeen = new Date();
   lastSeen = new Date();
-  remoteAddress: string;
-  networkName: string;
-  lastMessage: string;
+  remoteAddress?: string = undefined;
+  networkName: string | null = null;
+  lastMessage = '{}';
   closed = false;
   readyState = 1;
 
-  setNetworkName(networkName: string, networkMessage: (name: string) => void) {
+  setNetworkName(
+    networkName: string,
+    clientName: string,
+    networkMessage: (name: string) => void
+  ) {
     const previousName = this.networkName;
     this.networkName = networkName;
+    this.clientName = clientName;
 
     if (previousName) {
       networkMessage(previousName);
@@ -50,6 +57,7 @@ describe('ClientManager', () => {
       type: MessageType.WELCOME,
       clientId: client.clientId,
       clientColor: client.clientColor,
+      clientName: client.clientName,
     });
   });
 
