@@ -30,12 +30,7 @@ export class ClientManager {
   }
 
   addClient(client: Client) {
-    const localClients = this.getLocalClients(client);
-
-    let suggestedNetworkName = null;
-    if (localClients.length > 0) {
-      suggestedNetworkName = localClients[0].networkName;
-    }
+    const localNetworkNames = this.getLocalNetworkNames(client);
 
     this.clients.push(client);
 
@@ -45,7 +40,8 @@ export class ClientManager {
         clientId: client.clientId,
         clientColor: client.clientColor,
         clientName: client.clientName,
-        suggestedNetworkName: suggestedNetworkName,
+        suggestedNetworkName: localNetworkNames[0],
+        localNetworkNames,
         rtcConfiguration: rtcConfiguration(client.clientId),
         maxSize,
         noticeText,
@@ -59,11 +55,8 @@ export class ClientManager {
 
     if (isNameMessageModel(message)) {
       client.publicKey = message.publicKey;
-      client.setNetworkName(
-        message.networkName.toUpperCase(),
-        message.clientName.substring(0, maxClientNameLength),
-        this.sendNetworkMessage
-      );
+      client.clientName = message.clientName.substring(0, maxClientNameLength);
+      this.setNetworkName(client, message.networkName.toUpperCase());
     } else if (
       isActionMessageModel(message) ||
       isRTCDescriptionMessageModel(message) ||
@@ -127,10 +120,36 @@ export class ClientManager {
     });
   }
 
+  setNetworkName(client: Client, networkName?: string) {
+    const previousNetworkName = client.networkName;
+    client.networkName = networkName;
+
+    if (previousNetworkName && previousNetworkName !== networkName) {
+      this.sendNetworkMessage(previousNetworkName);
+    }
+
+    if (networkName) {
+      this.sendNetworkMessage(networkName);
+    }
+  }
+
   getLocalClients(client: Client) {
     return this.clients
       .filter(c => c.remoteAddress === client.remoteAddress && c.networkName)
       .sort((a, b) => b.lastSeen.getTime() - a.lastSeen.getTime());
+  }
+
+  getLocalNetworkNames(client: Client): string[] {
+    const localClients = this.getLocalClients(client);
+    const networkNames = new Set<string>();
+
+    for (const client of localClients) {
+      if (client.networkName) {
+        networkNames.add(client.networkName);
+      }
+    }
+
+    return [...networkNames.values()];
   }
 
   pingClients() {
@@ -152,7 +171,7 @@ export class ClientManager {
   }
 
   removeClient(client: Client) {
-    client.setNetworkName(null, null, this.sendNetworkMessage);
+    this.setNetworkName(client, undefined);
     this.clients = this.clients.filter(c => c !== client);
   }
 
@@ -161,7 +180,7 @@ export class ClientManager {
       if (client.readyState <= 1) {
         return true;
       } else {
-        client.setNetworkName(null, null, this.sendNetworkMessage);
+        this.setNetworkName(client, undefined);
         return false;
       }
     });

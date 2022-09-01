@@ -14,28 +14,10 @@ export class TestClient implements Client {
   readonly firstSeen = new Date();
   lastSeen = new Date();
   remoteAddress?: string = undefined;
-  networkName: string | null = null;
+  networkName?: string = undefined;
   lastMessage = '{}';
   closed = false;
   readyState = 1;
-
-  setNetworkName(
-    networkName: string,
-    clientName: string,
-    networkMessage: (name: string) => void
-  ) {
-    const previousName = this.networkName;
-    this.networkName = networkName;
-    this.clientName = clientName;
-
-    if (previousName) {
-      networkMessage(previousName);
-    }
-
-    if (networkName) {
-      networkMessage(networkName);
-    }
-  }
 
   send(data: string) {
     this.lastMessage = data;

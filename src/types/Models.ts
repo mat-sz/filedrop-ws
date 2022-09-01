@@ -2,7 +2,7 @@ import { MessageType, ActionMessageActionType } from './MessageType';
 
 export interface ClientModel {
   clientId: string;
-  clientName: string | null;
+  clientName?: string;
   clientColor: string;
   publicKey?: string;
 }
@@ -20,11 +20,17 @@ export interface WelcomeMessageModel extends MessageModel {
   clientId: string;
   clientColor: string;
   clientName: string;
-  suggestedNetworkName: string;
+  suggestedNetworkName?: string;
+  localNetworkNames: string[];
   rtcConfiguration?: any;
   maxSize: number;
   noticeText?: string;
   noticeUrl?: string;
+}
+
+export interface LocalNetworksMessageModel extends MessageModel {
+  type: MessageType.LOCAL_NETWORKS;
+  localNetworkNames: string[];
 }
 
 export interface NameMessageModel extends MessageModel {

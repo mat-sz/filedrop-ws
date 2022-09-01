@@ -14,10 +14,10 @@ export class WSClient implements Client {
   readonly clientId = uuid();
   readonly clientColor = randomColor({ luminosity: 'light' });
   readonly firstSeen = new Date();
-  clientName = generateClientName();
+  clientName?: string = generateClientName();
   lastSeen = new Date();
   readonly remoteAddress?: string;
-  networkName: string | null = null;
+  networkName?: string = undefined;
 
   constructor(private ws: WebSocket, req: IncomingMessage) {
     const address =
@@ -25,23 +25,6 @@ export class WSClient implements Client {
         ? req.headers['x-forwarded-for']
         : req.connection.remoteAddress;
     this.remoteAddress = typeof address === 'string' ? address : address?.[0];
-  }
-
-  setNetworkName(
-    networkName: string | null,
-    clientName: string | null,
-    networkMessage: (name: string) => void
-  ) {
-    const previousNetworkName = this.networkName;
-    this.networkName = networkName;
-
-    if (previousNetworkName) {
-      networkMessage(previousNetworkName);
-    }
-
-    if (networkName) {
-      networkMessage(networkName);
-    }
   }
 
   send(data: string) {
