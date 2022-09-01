@@ -2,7 +2,8 @@ import Joi from 'joi';
 
 import {
   MessageModel,
-  NameMessageModel,
+  NetworkNameMessageModel,
+  ClientNameMessageModel,
   TransferMessageModel,
   ActionMessageModel,
   RTCDescriptionMessageModel,
@@ -15,10 +16,14 @@ const messageModelSchema = Joi.object({
   type: Joi.string().alphanum().required(),
 }).required();
 
-const nameMessageModelSchema = Joi.object({
-  type: Joi.string().equal(MessageType.NAME).required(),
+const networkNameMessageModelSchema = Joi.object({
+  type: Joi.string().equal(MessageType.NETWORK_NAME).required(),
   networkName: Joi.string().alphanum().max(10).required(),
-  clientName: Joi.string().max(32),
+}).required();
+
+const clientNameMessageModelSchema = Joi.object({
+  type: Joi.string().equal(MessageType.CLIENT_NAME).required(),
+  clientName: Joi.string().max(32).required(),
 }).required();
 
 const transferMessageModelSchema = Joi.object({
@@ -67,10 +72,16 @@ export function isMessageModel(message: any): message is MessageModel {
   return !messageModelSchema.validate(message).error;
 }
 
-export function isNameMessageModel(
-  message: MessageModel | NameMessageModel
-): message is NameMessageModel {
-  return !nameMessageModelSchema.validate(message).error;
+export function isNetworkNameMessageModel(
+  message: MessageModel | NetworkNameMessageModel
+): message is NetworkNameMessageModel {
+  return !networkNameMessageModelSchema.validate(message).error;
+}
+
+export function isClientNameMessageModel(
+  message: MessageModel | ClientNameMessageModel
+): message is ClientNameMessageModel {
+  return !clientNameMessageModelSchema.validate(message).error;
 }
 
 export function isTransferMessageModel(

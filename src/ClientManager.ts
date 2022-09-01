@@ -1,7 +1,8 @@
 import { Client } from './types/Client';
 import { rtcConfiguration } from './utils/rtcConfiguration';
 import {
-  isNameMessageModel,
+  isNetworkNameMessageModel,
+  isClientNameMessageModel,
   isTransferMessageModel,
   isActionMessageModel,
   isRTCDescriptionMessageModel,
@@ -10,6 +11,7 @@ import {
 } from './utils/validation';
 import {
   ClientModel,
+  LocalNetworksMessageModel,
   MessageModel,
   NetworkMessageModel,
   TargetedMessageModel,
@@ -39,7 +41,7 @@ export class ClientManager {
         type: MessageType.WELCOME,
         clientId: client.clientId,
         clientColor: client.clientColor,
-        clientName: client.clientName,
+        suggestedClientName: client.clientName,
         suggestedNetworkName: localNetworkNames[0],
         localNetworkNames,
         rtcConfiguration: rtcConfiguration(client.clientId),
@@ -53,13 +55,12 @@ export class ClientManager {
   handleMessage(client: Client, message: MessageModel) {
     client.lastSeen = new Date();
 
-    if (isNameMessageModel(message)) {
+    if (isNetworkNameMessageModel(message)) {
       client.publicKey = message.publicKey;
-      if (message.clientName) {
-        client.clientName = message.clientName;
-      }
-
       this.setNetworkName(client, message.networkName.toUpperCase());
+    } else if (isClientNameMessageModel(message)) {
+      client.clientName = message.clientName;
+      this.setNetworkName(client, client.networkName);
     } else if (
       isActionMessageModel(message) ||
       isRTCDescriptionMessageModel(message) ||
@@ -93,6 +94,22 @@ export class ClientManager {
 
     const targets = this.clients.filter(c => c.clientId === message.targetId);
     targets.forEach(client => client.send(data));
+  }
+
+  sendLocalNetworksMessage(client: Client) {
+    const localClients = this.getLocalClients(client);
+    const localNetworkNames = this.getLocalNetworkNames(client);
+
+    const localNetworksMessage = JSON.stringify({
+      type: MessageType.LOCAL_NETWORKS,
+      localNetworkNames,
+    } as LocalNetworksMessageModel);
+
+    localClients.forEach(client => {
+      try {
+        client.send(localNetworksMessage);
+      } catch {}
+    });
   }
 
   sendNetworkMessage(networkName: string) {
@@ -134,6 +151,8 @@ export class ClientManager {
     if (networkName) {
       this.sendNetworkMessage(networkName);
     }
+
+    this.sendLocalNetworksMessage(client);
   }
 
   getLocalClients(client: Client) {

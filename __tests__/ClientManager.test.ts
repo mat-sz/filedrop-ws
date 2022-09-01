@@ -39,7 +39,7 @@ describe('ClientManager', () => {
       type: MessageType.WELCOME,
       clientId: client.clientId,
       clientColor: client.clientColor,
-      clientName: client.clientName,
+      suggestedClientName: client.clientName,
     });
   });
 

@@ -19,7 +19,7 @@ export interface WelcomeMessageModel extends MessageModel {
   type: MessageType.WELCOME;
   clientId: string;
   clientColor: string;
-  clientName: string;
+  suggestedClientName?: string;
   suggestedNetworkName?: string;
   localNetworkNames: string[];
   rtcConfiguration?: any;
@@ -33,11 +33,15 @@ export interface LocalNetworksMessageModel extends MessageModel {
   localNetworkNames: string[];
 }
 
-export interface NameMessageModel extends MessageModel {
-  type: MessageType.NAME;
-  clientName?: string;
+export interface NetworkNameMessageModel extends MessageModel {
+  type: MessageType.NETWORK_NAME;
   networkName: string;
   publicKey?: string;
+}
+
+export interface ClientNameMessageModel extends MessageModel {
+  type: MessageType.CLIENT_NAME;
+  clientName: string;
 }
 
 export interface TransferMessageModel extends TargetedMessageModel {
