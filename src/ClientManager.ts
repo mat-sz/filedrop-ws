@@ -55,7 +55,10 @@ export class ClientManager {
 
     if (isNameMessageModel(message)) {
       client.publicKey = message.publicKey;
-      client.clientName = message.clientName.substring(0, maxClientNameLength);
+      if (message.clientName) {
+        client.clientName = message.clientName;
+      }
+
       this.setNetworkName(client, message.networkName.toUpperCase());
     } else if (
       isActionMessageModel(message) ||

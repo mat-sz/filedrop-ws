@@ -35,7 +35,7 @@ export interface LocalNetworksMessageModel extends MessageModel {
 
 export interface NameMessageModel extends MessageModel {
   type: MessageType.NAME;
-  clientName: string;
+  clientName?: string;
   networkName: string;
   publicKey?: string;
 }
