@@ -129,7 +129,7 @@ describe('ClientManager', () => {
       type: MessageType.ACTION,
       action: ActionMessageActionType.ACCEPT,
       targetId: client2.clientId,
-      transferId: 'test',
+      transferId: uuid(),
     };
 
     clientManager.handleMessage(client1, targetedMessage);

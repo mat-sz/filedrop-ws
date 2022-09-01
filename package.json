@@ -15,6 +15,7 @@
     "eslint": "^8.15.0",
     "husky": "^8.0.1",
     "jest": "^28.1.0",
+    "joi": "^17.6.0",
     "lint-staged": "^12.4.1",
     "prettier": "^2.6.2",
     "randomcolor": "^0.6.2",

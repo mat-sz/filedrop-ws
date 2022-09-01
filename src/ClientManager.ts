@@ -7,7 +7,7 @@ import {
   isRTCDescriptionMessageModel,
   isRTCCandidateMessageModel,
   isEncryptedMessageModel,
-} from './types/typeChecking';
+} from './utils/validation';
 import {
   ClientModel,
   MessageModel,

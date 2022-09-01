@@ -5,7 +5,7 @@ import WebSocket from 'ws';
 
 import { WSClient } from './WSClient';
 import { ClientManager, maxSize } from './ClientManager';
-import { isMessageModel } from './types/typeChecking';
+import { isMessageModel } from './utils/validation';
 
 // Configuration
 const host = process.env.WS_HOST || '127.0.0.1';
