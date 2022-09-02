@@ -3,7 +3,6 @@ import { MessageType, ActionMessageActionType } from './MessageType';
 export interface ClientModel {
   clientId: string;
   clientName?: string;
-  clientColor: string;
   publicKey?: string;
 }
 
@@ -18,7 +17,6 @@ export interface TargetedMessageModel extends MessageModel {
 export interface WelcomeMessageModel extends MessageModel {
   type: MessageType.WELCOME;
   clientId: string;
-  clientColor: string;
   suggestedClientName?: string;
   suggestedNetworkName?: string;
   localNetworkNames: string[];

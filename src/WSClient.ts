@@ -1,5 +1,4 @@
 import { v4 as uuid } from 'uuid';
-import randomColor from 'randomcolor';
 import { IncomingMessage } from 'http';
 import WebSocket from 'ws';
 
@@ -12,7 +11,6 @@ const acceptForwardedFor =
 
 export class WSClient implements Client {
   readonly clientId = uuid();
-  readonly clientColor = randomColor({ luminosity: 'light' });
   readonly firstSeen = new Date();
   clientName?: string = generateClientName();
   lastSeen = new Date();

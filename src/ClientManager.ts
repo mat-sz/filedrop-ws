@@ -40,7 +40,6 @@ export class ClientManager {
       JSON.stringify({
         type: MessageType.WELCOME,
         clientId: client.clientId,
-        clientColor: client.clientColor,
         suggestedClientName: client.clientName,
         suggestedNetworkName: localNetworkNames[0],
         localNetworkNames,
@@ -122,7 +121,6 @@ export class ClientManager {
       .map(client => {
         return {
           clientId: client.clientId,
-          clientColor: client.clientColor,
           clientName: client.clientName,
           publicKey: client.publicKey,
         };

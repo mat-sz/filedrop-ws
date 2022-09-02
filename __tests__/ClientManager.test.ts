@@ -1,5 +1,4 @@
 import { v4 as uuid } from 'uuid';
-import randomColor from 'randomcolor';
 
 import { ClientManager } from '../src/ClientManager';
 import { Client } from '../src/types/Client';
@@ -9,7 +8,6 @@ import { TargetedMessageModel, ActionMessageModel } from '../src/types/Models';
 
 export class TestClient implements Client {
   readonly clientId = uuid();
-  readonly clientColor = randomColor({ luminosity: 'light' });
   clientName = generateClientName();
   readonly firstSeen = new Date();
   lastSeen = new Date();
@@ -38,7 +36,6 @@ describe('ClientManager', () => {
     expect(JSON.parse(client.lastMessage)).toMatchObject({
       type: MessageType.WELCOME,
       clientId: client.clientId,
-      clientColor: client.clientColor,
       suggestedClientName: client.clientName,
     });
   });

@@ -1,6 +1,5 @@
 export interface Client {
   readonly clientId: string;
-  readonly clientColor: string;
   clientName?: string;
   readonly firstSeen: Date;
   lastSeen: Date;
