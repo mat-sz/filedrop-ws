@@ -116,23 +116,26 @@ export class ClientManager {
       client => client.networkName === networkName
     );
 
-    const network: ClientModel[] = networkClients
-      .sort((a, b) => b.firstSeen.getTime() - a.firstSeen.getTime())
-      .map(client => {
-        return {
-          clientId: client.clientId,
-          clientName: client.clientName,
-          publicKey: client.publicKey,
-        };
-      });
-
-    const networkMessage = JSON.stringify({
-      type: MessageType.NETWORK,
-      clients: network,
-    } as NetworkMessageModel);
+    const sortedClients = networkClients.sort(
+      (a, b) => b.firstSeen.getTime() - a.firstSeen.getTime()
+    );
 
     networkClients.forEach(client => {
       try {
+        const clients = sortedClients.map(otherClient => {
+          return {
+            clientId: otherClient.clientId,
+            clientName: otherClient.clientName,
+            publicKey: otherClient.publicKey,
+            isLocal: otherClient.remoteAddress === client.remoteAddress,
+          };
+        });
+
+        const networkMessage = JSON.stringify({
+          type: MessageType.NETWORK,
+          clients,
+        } as NetworkMessageModel);
+
         client.send(networkMessage);
       } catch {}
     });
