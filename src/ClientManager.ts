@@ -10,7 +10,6 @@ import {
   isEncryptedMessageModel,
 } from './utils/validation';
 import {
-  ClientModel,
   LocalNetworksMessageModel,
   MessageModel,
   NetworkMessageModel,
@@ -42,6 +41,7 @@ export class ClientManager {
         clientId: client.clientId,
         suggestedClientName: client.clientName,
         suggestedNetworkName: localNetworkNames[0],
+        remoteAddress: client.remoteAddress,
         localNetworkNames,
         rtcConfiguration: rtcConfiguration(client.clientId),
         maxSize,
