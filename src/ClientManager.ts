@@ -10,6 +10,7 @@ import {
   isEncryptedMessageModel,
 } from './utils/validation';
 import {
+  ClientModel,
   LocalNetworksMessageModel,
   MessageModel,
   NetworkMessageModel,
@@ -56,6 +57,7 @@ export class ClientManager {
 
     if (isNetworkNameMessageModel(message)) {
       client.publicKey = message.publicKey;
+      client.deviceType = message.deviceType;
       this.setNetworkName(client, message.networkName.toUpperCase());
     } else if (isClientNameMessageModel(message)) {
       client.clientName = message.clientName;
@@ -122,12 +124,13 @@ export class ClientManager {
 
     networkClients.forEach(client => {
       try {
-        const clients = sortedClients.map(otherClient => {
+        const clients: ClientModel[] = sortedClients.map(otherClient => {
           return {
             clientId: otherClient.clientId,
             clientName: otherClient.clientName,
             publicKey: otherClient.publicKey,
             isLocal: otherClient.remoteAddress === client.remoteAddress,
+            deviceType: otherClient.deviceType,
           };
         });
 

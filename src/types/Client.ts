@@ -1,3 +1,5 @@
+import { DeviceType } from './DeviceType';
+
 export interface Client {
   readonly clientId: string;
   clientName?: string;
@@ -7,6 +9,7 @@ export interface Client {
   networkName?: string;
   readonly readyState: number;
   publicKey?: string;
+  deviceType?: DeviceType;
 
   send(data: string): void;
   close(): void;

@@ -11,6 +11,7 @@ import {
   EncryptedMessageModel,
 } from '../types/Models';
 import { MessageType, ActionMessageActionType } from '../types/MessageType';
+import { DeviceType } from '../types/DeviceType';
 
 const messageModelSchema = Joi.object({
   type: Joi.string().alphanum().required(),
@@ -18,10 +19,12 @@ const messageModelSchema = Joi.object({
   .unknown(true)
   .required();
 
+const validDeviceTypes = Object.values(DeviceType);
 const networkNameMessageModelSchema = Joi.object({
   type: Joi.string().equal(MessageType.NETWORK_NAME).required(),
   networkName: Joi.string().alphanum().max(10).required(),
   publicKey: Joi.string(),
+  deviceType: Joi.string().equal(...validDeviceTypes),
 }).required();
 
 const clientNameMessageModelSchema = Joi.object({

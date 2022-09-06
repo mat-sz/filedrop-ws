@@ -1,3 +1,4 @@
+import { DeviceType } from './DeviceType';
 import { MessageType, ActionMessageActionType } from './MessageType';
 
 export interface ClientModel {
@@ -5,6 +6,7 @@ export interface ClientModel {
   clientName?: string;
   publicKey?: string;
   isLocal: boolean;
+  deviceType?: DeviceType;
 }
 
 export interface MessageModel {
@@ -37,6 +39,7 @@ export interface NetworkNameMessageModel extends MessageModel {
   type: MessageType.NETWORK_NAME;
   networkName: string;
   publicKey?: string;
+  deviceType?: DeviceType;
 }
 
 export interface ClientNameMessageModel extends MessageModel {
