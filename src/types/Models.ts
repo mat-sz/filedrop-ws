@@ -91,6 +91,5 @@ export interface RTCCandidateMessageModel extends TargetedMessageModel {
 export interface EncryptedMessageModel extends TargetedMessageModel {
   type: MessageType.ENCRYPTED;
   payload: string;
-  secret: string;
   clientId?: string;
 }
