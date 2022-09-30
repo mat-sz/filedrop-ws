@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-const stunServer = process.env.STUN_SERVER || 'stun:stun.1.google.com:19302';
+const stunServer = process.env.STUN_SERVER || 'stun:stun.l.google.com:19302';
 const turnMode = process.env.TURN_MODE || 'default';
 const turnServer = process.env.TURN_SERVER || null;
 const turnUsername = process.env.TURN_USERNAME || null;
